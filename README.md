@@ -1,0 +1,2 @@
+# splayneri_kirarumy_mayruxineri_naxagtsman_jamanak
+Սփայների կիրառումը մայրուղիների նախագծման ժամանակ
