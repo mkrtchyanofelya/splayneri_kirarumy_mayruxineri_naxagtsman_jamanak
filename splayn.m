@@ -11,17 +11,14 @@ N_st = 200;
 
 A0 = sqrt(R * Lc);
 
-%% ----------------------------
-% Քլոթոիդի մոտարկումներ
+
 x_cl = @(s) s - (s.^5)/(40*A0^4) + (s.^9)/(3456*A0^8);
 y_cl = @(s) (s.^3)/(6*A0^2) - (s.^7)/(336*A0^6) + (s.^11)/(42240*A0^10);
 
 
-% straight 1
 x_st1 = linspace(0, L1, N_st);
 y_st1 = zeros(size(x_st1));
 
-% clothoid 1
 s = linspace(0, Lc, N_cl);
 x_c1 = x_st1(end) + x_cl(s);
 y_c1 = y_st1(end) + y_cl(s);
@@ -33,7 +30,6 @@ theta_c1_end = 0.5 * a * Lc^2;
 x1_end = x_c1(end);
 y1_end = y_c1(end);
 
-% Arc
 cx = x1_end - R*sin(theta_c1_end);
 cy = y1_end + R*cos(theta_c1_end);
 
@@ -48,7 +44,6 @@ x_arc_end = x_arc(end);
 y_arc_end = y_arc(end);
 theta_arc_end = phi(end) + pi/2;
 
-% clothoid 2
 s2 = linspace(Lc, 0, N_cl);
 x_tmp = x_cl(s2);
 y_tmp = -y_cl(s2);
@@ -67,7 +62,6 @@ pts = Rmat * [x_tmp; y_tmp];
 x_c2 = pts(1,:) + x_arc_end;
 y_c2 = pts(2,:) + y_arc_end;
 
-% straight 2
 theta_end_c2 = atan2(y_c2(end)-y_c2(end-1), x_c2(end)-x_c2(end-1));
 tvec = linspace(0, L2, N_st);
 x_st2 = x_c2(end) + tvec*cos(theta_end_c2);
