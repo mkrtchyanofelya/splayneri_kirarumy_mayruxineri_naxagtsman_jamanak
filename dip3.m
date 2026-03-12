@@ -1,4 +1,3 @@
-clear; clc; close all;
 
 P0 = [0 0];
 P1 = [100 20];
@@ -62,7 +61,6 @@ function P = cubicBezier(P0, P1, P2, P3, t)
 end
 
 function labelPoint(ax, P, txt, offset)
-    % offset in data units: [dx dy]
     text(ax, P(1)+offset(1), P(2)+offset(2), txt, ...
         'FontSize',12, 'FontWeight','bold', 'Interpreter','tex');
 end
