@@ -1,3 +1,4 @@
+clear; clc; close all;
 
 P0 = [0 0];
 P1 = [100 20];
@@ -9,9 +10,12 @@ B = [80 20];
 C = 2*P1 - B;          
 D = A - 2*B + 2*C;     
 
-t  = linspace(0,1,800);
-B1 = cubicBezier(P0, A, B, P1, t);
-B2 = cubicBezier(P1, C, D, P2, t);
+t = linspace(0,1,800);
+t = t(:);
+u = 1 - t;
+
+B1 = (u.^3)*P0 + 3*(u.^2).*t*A + 3*u.*(t.^2)*B + (t.^3)*P1;
+B2 = (u.^3)*P1 + 3*(u.^2).*t*C + 3*u.*(t.^2)*D + (t.^3)*P2;
 
 fig = figure('Color','w','Units','pixels','Position',[100 100 1000 450]);
 ax = axes(fig); hold(ax,'on'); grid(ax,'on'); box(ax,'on');
@@ -49,16 +53,11 @@ labelPoint(ax, C,  'C(120,20)',     [ 6   8]);
 labelPoint(ax, D,  'D(130,15)',     [ 6  -12]);
 labelPoint(ax, P2, 'P_2(200,0)',    [ 6  -12]);
 
-exportgraphics(fig, 'bezier_highway.pdf', 'ContentType','vector');      
-exportgraphics(fig, 'bezier_highway.png', 'Resolution',600);            
+ax.Toolbar.Visible = 'off';
+disableDefaultInteractivity(ax);
 
-
-
-function P = cubicBezier(P0, P1, P2, P3, t)
-    t = t(:);
-    u = 1 - t;
-    P = (u.^3)*P0 + 3*(u.^2).*t*P1 + 3*u.*(t.^2)*P2 + (t.^3)*P3;
-end
+exportgraphics(fig, 'bezier_highway.pdf', 'ContentType','vector');
+exportgraphics(fig, 'bezier_highway.png', 'Resolution',600);
 
 function labelPoint(ax, P, txt, offset)
     text(ax, P(1)+offset(1), P(2)+offset(2), txt, ...
