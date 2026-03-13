@@ -11,10 +11,8 @@ N_st = 200;
 
 A0 = sqrt(R * Lc);
 
-
 x_cl = @(s) s - (s.^5)/(40*A0^4) + (s.^9)/(3456*A0^8);
 y_cl = @(s) (s.^3)/(6*A0^2) - (s.^7)/(336*A0^6) + (s.^11)/(42240*A0^10);
-
 
 x_st1 = linspace(0, L1, N_st);
 y_st1 = zeros(size(x_st1));
@@ -79,7 +77,6 @@ X_rot = pts(1,:);
 Y_rot = pts(2,:);
 
 Y_rot = -Y_rot;
-
 
 X_rot = X_rot - min(X_rot);
 Y_rot = Y_rot - min(Y_rot);
