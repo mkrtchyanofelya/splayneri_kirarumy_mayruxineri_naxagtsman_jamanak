@@ -1,0 +1,140 @@
+
+k  = 0.2;
+R0 = 100;
+L  = 400;
+
+Ls = 25;
+phi = 30*pi/180;       
+alpha0 = 8*pi/180;     
+
+p = (1-k)/k;
+
+
+f = @(beta) (L./(k.*beta)) .* (sin(beta)).^p - R0;
+
+
+Nscan = 6000;
+a_scan = 1e-4;
+b_scan = pi/2 - 1e-4;
+
+beta_scan = a_scan + (0:Nscan-1)*(b_scan-a_scan)/(Nscan-1);
+
+f_scan = f(beta_scan);
+
+idx = 0;
+for i = 1:length(f_scan)-1
+    if f_scan(i)*f_scan(i+1) < 0
+        idx = i;
+        break;
+    end
+end
+
+if idx == 0
+    error('beta0-ի իրական լուծում չգտնվեց');
+end
+
+
+a = beta_scan(idx);
+b = beta_scan(idx+1);
+
+fa = f(a);
+fb = f(b);
+
+if fa*fb > 0
+    error('Կիսման մեթոդի համար ճիշտ միջակայք չի գտնվել');
+end
+
+tol = 1e-12;
+maxIter = 1000;
+
+for iter = 1:maxIter
+    c = (a + b)/2;
+    fc = f(c);
+
+    if fa*fc < 0
+        b = c;
+        fb = fc;
+    else
+        a = c;
+        fa = fc;
+    end
+
+    if abs(b - a) < tol
+        break;
+    end
+end
+
+beta0 = (a + b)/2;
+A0 = L/(k*beta0);
+
+
+Nk = 4000;
+beta = 0 + (0:Nk-1)*(beta0-0)/(Nk-1);   
+
+Fx = cos(beta) .* (sin(beta)).^p;
+Fy = sin(beta) .* (sin(beta)).^p;
+
+xK_local = zeros(1, Nk);
+yK_local = zeros(1, Nk);
+
+for i = 2:Nk
+    db = beta(i) - beta(i-1);
+
+    xK_local(i) = xK_local(i-1) + 0.5*db*(Fx(i-1) + Fx(i));
+    yK_local(i) = yK_local(i-1) + 0.5*db*(Fy(i-1) + Fy(i));
+end
+
+xK_local = A0 * xK_local;
+yK_local = A0 * yK_local;
+
+Ns = 300;
+s = 0 + (0:Ns-1)*(Ls-0)/(Ns-1);   
+
+xS = s*cos(alpha0);
+yS = s*sin(alpha0);
+
+x1 = xS(end);
+y1 = yS(end);
+
+xK = zeros(1, Nk);
+yK = zeros(1, Nk);
+
+for i = 1:Nk
+    xK(i) = x1 + xK_local(i)*cos(alpha0) - yK_local(i)*sin(alpha0);
+    yK(i) = y1 + xK_local(i)*sin(alpha0) + yK_local(i)*cos(alpha0);
+end
+
+
+x2 = xK(end);
+y2 = yK(end);
+
+alpha1 = alpha0 + beta0;
+
+xc = x2 - R0*sin(alpha1);
+yc = y2 + R0*cos(alpha1);
+
+theta_start = atan2(y2 - yc, x2 - xc);
+
+Nc = 1200;
+theta = theta_start + (0:Nc-1)*(phi)/(Nc-1);  
+
+xC = xc + R0*cos(theta);
+yC = yc + R0*sin(theta);
+
+figure('Color','w','Position',[100 100 1100 600]);
+hold on; grid on; box on; axis equal;
+
+plot(xS, yS, 'k', 'LineWidth', 2.2);
+plot(xK, yK, 'b', 'LineWidth', 2.6);
+plot(xC, yC, 'r', 'LineWidth', 2.6);
+
+xlabel('x', 'FontSize', 12);
+ylabel('y', 'FontSize', 12);
+title('Ուղիղ -> K-աձև կոր -> Աղեղ');
+legend('Ուղիղ', 'K-աձև կոր', 'Աղեղ', 'Location', 'best');
+
+
+disp(['beta0 = ', num2str(beta0)]);
+disp(['A0    = ', num2str(A0)]);
+disp(['alpha1 (deg) = ', num2str(alpha1*180/pi)]);
+disp(['Arc center = (', num2str(xc), ', ', num2str(yc), ')']);
