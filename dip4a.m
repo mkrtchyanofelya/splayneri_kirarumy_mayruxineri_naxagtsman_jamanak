@@ -1,25 +1,23 @@
 
-k  = 0.2;
-R0 = 100;
-L  = 400;
+k   = 0.2;              
+R0  = 100;             
+L   = 400;              
+phi = 30*pi/180;        
 
-Ls = 25;
-phi = 30*pi/180;       
-alpha0 = 8*pi/180;     
+Ls     = 25;           
+alpha0 = 5*pi/180;      
 
 p = (1-k)/k;
 
 
 f = @(beta) (L./(k.*beta)) .* (sin(beta)).^p - R0;
 
-
-Nscan = 6000;
 a_scan = 1e-4;
 b_scan = pi/2 - 1e-4;
+Nscan  = 6000;
 
-beta_scan = a_scan + (0:Nscan-1)*(b_scan-a_scan)/(Nscan-1);
-
-f_scan = f(beta_scan);
+beta_scan = linspace(a_scan, b_scan, Nscan);
+f_scan = arrayfun(f, beta_scan);
 
 idx = 0;
 for i = 1:length(f_scan)-1
@@ -32,7 +30,6 @@ end
 if idx == 0
     error('beta0-ի իրական լուծում չգտնվեց');
 end
-
 
 a = beta_scan(idx);
 b = beta_scan(idx+1);
@@ -65,11 +62,11 @@ for iter = 1:maxIter
 end
 
 beta0 = (a + b)/2;
-A0 = L/(k*beta0);
+A0    = L/(k*beta0);
 
 
 Nk = 4000;
-beta = 0 + (0:Nk-1)*(beta0-0)/(Nk-1);   
+beta = linspace(0, beta0, Nk);
 
 Fx = cos(beta) .* (sin(beta)).^p;
 Fy = sin(beta) .* (sin(beta)).^p;
@@ -88,13 +85,14 @@ xK_local = A0 * xK_local;
 yK_local = A0 * yK_local;
 
 Ns = 300;
-s = 0 + (0:Ns-1)*(Ls-0)/(Ns-1);   
+s = linspace(0, Ls, Ns);
 
 xS = s*cos(alpha0);
 yS = s*sin(alpha0);
 
 x1 = xS(end);
 y1 = yS(end);
+
 
 xK = zeros(1, Nk);
 yK = zeros(1, Nk);
@@ -108,7 +106,7 @@ end
 x2 = xK(end);
 y2 = yK(end);
 
-alpha1 = alpha0 + beta0;
+alpha1 = alpha0 + beta0;    
 
 xc = x2 - R0*sin(alpha1);
 yc = y2 + R0*cos(alpha1);
@@ -116,10 +114,11 @@ yc = y2 + R0*cos(alpha1);
 theta_start = atan2(y2 - yc, x2 - xc);
 
 Nc = 1200;
-theta = theta_start + (0:Nc-1)*(phi)/(Nc-1);  
+theta = linspace(theta_start, theta_start + phi, Nc);
 
 xC = xc + R0*cos(theta);
 yC = yc + R0*sin(theta);
+
 
 figure('Color','w','Position',[100 100 1100 600]);
 hold on; grid on; box on; axis equal;
@@ -128,13 +127,11 @@ plot(xS, yS, 'k', 'LineWidth', 2.2);
 plot(xK, yK, 'b', 'LineWidth', 2.6);
 plot(xC, yC, 'r', 'LineWidth', 2.6);
 
+plot(xS(1), yS(1), 'ko', 'MarkerFaceColor', 'k', 'MarkerSize', 6);    
+plot(x1, y1, 'ko', 'MarkerFaceColor', 'k', 'MarkerSize', 6);          
+plot(xK(end), yK(end), 'ko', 'MarkerFaceColor', 'k', 'MarkerSize', 6);
+
 xlabel('x', 'FontSize', 12);
 ylabel('y', 'FontSize', 12);
-title('Ուղիղ -> K-աձև կոր -> Աղեղ');
+title('Թեք ուղիղ -> K-աձև կոր -> Աղեղ', 'FontSize', 13);
 legend('Ուղիղ', 'K-աձև կոր', 'Աղեղ', 'Location', 'best');
-
-
-disp(['beta0 = ', num2str(beta0)]);
-disp(['A0    = ', num2str(A0)]);
-disp(['alpha1 (deg) = ', num2str(alpha1*180/pi)]);
-disp(['Arc center = (', num2str(xc), ', ', num2str(yc), ')']);
