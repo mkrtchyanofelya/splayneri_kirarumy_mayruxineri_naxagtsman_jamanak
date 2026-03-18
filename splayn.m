@@ -1,102 +1,102 @@
+clc; clear; close all;
 
 L1 = 200;
-R = 600;
-V = 28;
-t = 3;
-Lc = V * t;
+R  = 600;
+V  = 28;
+t  = 3;
+Lc = V*t;
 L2 = 250;
-N_cl = 500;
+
+N_st  = 200;
+N_cl  = 500;
 N_arc = 1000;
-N_st = 200;
 
-A0 = sqrt(R * Lc);
+A0 = sqrt(R*Lc);
+alpha = deg2rad(20);
+beta  = deg2rad(90);
 
-x_cl = @(s) s - (s.^5)/(40*A0^4) + (s.^9)/(3456*A0^8);
-y_cl = @(s) (s.^3)/(6*A0^2) - (s.^7)/(336*A0^6) + (s.^11)/(42240*A0^10);
+delta = Lc/(2*R);
 
-x_st1 = linspace(0, L1, N_st);
-y_st1 = zeros(size(x_st1));
+xcl  = @(s) s - (s.^5)/(40*A0^4) + (s.^9)/(3456*A0^8);
+ycl  = @(s) (s.^3)/(6*A0^2) - (s.^7)/(336*A0^6) + (s.^11)/(42240*A0^10);
+
+rot2 = @(ang) [cos(ang), -sin(ang); sin(ang), cos(ang)];
+
+u1 = linspace(0, L1, N_st);
+x1 = u1*cos(alpha);
+y1 = u1*sin(alpha);
+
+xA = x1(end);
+yA = y1(end);
 
 s = linspace(0, Lc, N_cl);
-x_c1 = x_st1(end) + x_cl(s);
-y_c1 = y_st1(end) + y_cl(s);
 
-k_end = 1/R;
-a = k_end / Lc;
-theta_c1_end = 0.5 * a * Lc^2;
+P2_local = [xcl(s); -ycl(s)];
+P2 = rot2(alpha) * P2_local;
 
-x1_end = x_c1(end);
-y1_end = y_c1(end);
+x2 = xA + P2(1,:);
+y2 = yA + P2(2,:);
 
-cx = x1_end - R*sin(theta_c1_end);
-cy = y1_end + R*cos(theta_c1_end);
+xB = x2(end);
+yB = y2(end);
 
-phi0 = theta_c1_end - pi/2;
-arc_angle = deg2rad(90);
+psi1 = alpha - delta;
 
-phi = linspace(phi0, phi0 + arc_angle, N_arc);
-x_arc = cx + R*cos(phi);
-y_arc = cy + R*sin(phi);
+Cx = xB + R*sin(psi1);
+Cy = yB - R*cos(psi1);
 
-x_arc_end = x_arc(end);
-y_arc_end = y_arc(end);
-theta_arc_end = phi(end) + pi/2;
+phi0 = psi1 + pi/2;
+th = linspace(0, beta, N_arc);
 
-s2 = linspace(Lc, 0, N_cl);
-x_tmp = x_cl(s2);
-y_tmp = -y_cl(s2);
+x3 = Cx + R*cos(phi0 - th);
+y3 = Cy + R*sin(phi0 - th);
 
-x_tmp = x_tmp - x_tmp(1);
-y_tmp = y_tmp - y_tmp(1);
+xD = x3(end);
+yD = y3(end);
 
-dx = x_tmp(2) - x_tmp(1);
-dy = y_tmp(2) - y_tmp(1);
-theta0 = atan2(dy, dx);
+psi2 = psi1 - beta;
 
-rot = theta_arc_end - theta0;
-Rmat = [cos(rot), -sin(rot); sin(rot), cos(rot)];
-pts = Rmat * [x_tmp; y_tmp];
+s4 = linspace(0, Lc, N_cl);
 
-x_c2 = pts(1,:) + x_arc_end;
-y_c2 = pts(2,:) + y_arc_end;
+u = cos(delta) * (xcl(Lc) - xcl(Lc - s4)) + ...
+    sin(delta) * (ycl(Lc) - ycl(Lc - s4));
 
-theta_end_c2 = atan2(y_c2(end)-y_c2(end-1), x_c2(end)-x_c2(end-1));
-tvec = linspace(0, L2, N_st);
-x_st2 = x_c2(end) + tvec*cos(theta_end_c2);
-y_st2 = y_c2(end) + tvec*sin(theta_end_c2);
+v = cos(delta) * (ycl(Lc) - ycl(Lc - s4)) - ...
+    sin(delta) * (xcl(Lc) - xcl(Lc - s4));
 
-X_all = [x_st1, x_c1, x_arc, x_c2, x_st2];
-Y_all = [y_st1, y_c1, y_arc, y_c2, y_st2];
+P4 = rot2(psi2) * [u; v];
 
+x4 = xD + P4(1,:);
+y4 = yD + P4(2,:);
 
-angle_deg = -20;
-angle = deg2rad(angle_deg);
-Rm = [cos(angle), -sin(angle); sin(angle), cos(angle)];
-pts = Rm * [X_all; Y_all];
-X_rot = pts(1,:);
-Y_rot = pts(2,:);
+xE = x4(end);
+yE = y4(end);
 
-Y_rot = -Y_rot;
+psi3 = psi2 - delta;
 
-X_rot = X_rot - min(X_rot);
-Y_rot = Y_rot - min(Y_rot);
+u5 = linspace(0, L2, N_st);
+x5 = xE + u5*cos(psi3);
+y5 = yE + u5*sin(psi3);
+
+xmin = min([x1 x2 x3 x4 x5]);
+ymin = min([y1 y2 y3 y4 y5]);
+
+x1 = x1 - xmin; y1 = y1 - ymin;
+x2 = x2 - xmin; y2 = y2 - ymin;
+x3 = x3 - xmin; y3 = y3 - ymin;
+x4 = x4 - xmin; y4 = y4 - ymin;
+x5 = x5 - xmin; y5 = y5 - ymin;
 
 figure('Position',[100 100 1000 700]);
 hold on; grid on; axis equal;
 xlabel('x'); ylabel('y');
-title('Straight → Clothoid → Arc → Clothoid → Straight');
+title('Straight -> Clothoid -> Arc -> Clothoid -> Straight');
 
-N1 = N_st;
-N2 = N_cl;
-N3 = N_arc;
-N4 = N_cl;
-N5 = N_st;
-
-plot(X_rot(1:N1), Y_rot(1:N1), 'b', 'LineWidth', 2, 'DisplayName','Straight-1');
-plot(X_rot(N1+1:N1+N2), Y_rot(N1+1:N1+N2), 'g', 'LineWidth', 2, 'DisplayName','Clothoid-in');
-plot(X_rot(N1+N2+1:N1+N2+N3), Y_rot(N1+N2+1:N1+N2+N3), 'r', 'LineWidth', 2, 'DisplayName','Arc');
-plot(X_rot(N1+N2+N3+1:N1+N2+N3+N4), Y_rot(N1+N2+N3+1:N1+N2+N3+N4), 'c', 'LineWidth', 2, 'DisplayName','Clothoid-out');
-plot(X_rot(end-N5+1:end), Y_rot(end-N5+1:end), 'm', 'LineWidth', 2, 'DisplayName','Straight-2');
+plot(x1, y1, 'b', 'LineWidth', 2, 'DisplayName','Straight-1');
+plot(x2, y2, 'g', 'LineWidth', 2, 'DisplayName','Clothoid-in');
+plot(x3, y3, 'r', 'LineWidth', 2, 'DisplayName','Arc');
+plot(x4, y4, 'c', 'LineWidth', 2, 'DisplayName','Clothoid-out');
+plot(x5, y5, 'm', 'LineWidth', 2, 'DisplayName','Straight-2');
 
 legend;
 hold off;
