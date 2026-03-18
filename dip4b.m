@@ -139,9 +139,6 @@ plot(xA1, yA1, 'k', 'LineWidth', 2.5);
 plot(xK,  yK,  'b', 'LineWidth', 2.7);
 plot(xA2, yA2, 'r', 'LineWidth', 2.5);
 
-plot(x0, y0, 'ko', 'MarkerFaceColor', 'k', 'MarkerSize', 6);
-plot(x1, y1, 'ko', 'MarkerFaceColor', 'k', 'MarkerSize', 6);
-plot(x2, y2, 'ko', 'MarkerFaceColor', 'k', 'MarkerSize', 6);
 
 xlabel('x', 'FontSize', 12);
 ylabel('y', 'FontSize', 12);
