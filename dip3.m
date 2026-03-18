@@ -54,48 +54,6 @@ labelPoint(ax, C,  'C(120,20)',   [ 6   8]);
 labelPoint(ax, D,  'D(130,15)',   [ 6  -12]);
 labelPoint(ax, P2, 'P_2(200,0)',  [ 6  -12]);
 
-segments = {
-    P0, A, B, P1;
-    P1, C, D, P2
-};
-
-for i = 1:size(segments,1)
-    Q0 = segments{i,1};
-    Q1 = segments{i,2};
-    Q2 = segments{i,3};
-    Q3 = segments{i,4};
-
-    [ax0, ax1, ax2, ax3] = bezierPolyCoeffs(Q0(1), Q1(1), Q2(1), Q3(1));
-    [ay0, ay1, ay2, ay3] = bezierPolyCoeffs(Q0(2), Q1(2), Q2(2), Q3(2));
-
-    fprintf('%d) Բեզյեի կոր.\n', i);
-    fprintf('x%d(t) = %s\n', i, polyToString(ax0, ax1, ax2, ax3));
-    fprintf('y%d(t) = %s\n', i, polyToString(ay0, ay1, ay2, ay3));
-    fprintf('B%d(t) = (%s, %s)\n\n', i, ...
-        polyToString(ax0, ax1, ax2, ax3), ...
-        polyToString(ay0, ay1, ay2, ay3));
-end
-
-function [a0,a1,a2,a3] = bezierPolyCoeffs(q0,q1,q2,q3)
-    a0 = q0;
-    a1 = -3*q0 + 3*q1;
-    a2 = 3*q0 - 6*q1 + 3*q2;
-    a3 = -q0 + 3*q1 - 3*q2 + q3;
-end
-
-function s = polyToString(a0,a1,a2,a3)
-    c = [a0 a1 a2 a3];
-    p = {'','t','t^2','t^3'};
-    idx = c ~= 0;
-    if ~any(idx)
-        s = '0';
-    else
-        s = strjoin(arrayfun(@(k) sprintf('%+g%s', c(k), p{k}), find(idx), ...
-            'UniformOutput', false), ' ');
-        s = regexprep(s, '^\+', '');
-    end
-end
-
 function labelPoint(ax, P, txt, offset)
     text(ax, P(1)+offset(1), P(2)+offset(2), txt, ...
         'FontSize',12, 'FontWeight','bold', 'Interpreter','tex');
