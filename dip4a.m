@@ -127,10 +127,6 @@ plot(xS, yS, 'k', 'LineWidth', 2.2);
 plot(xK, yK, 'b', 'LineWidth', 2.6);
 plot(xC, yC, 'r', 'LineWidth', 2.6);
 
-plot(xS(1), yS(1), 'ko', 'MarkerFaceColor', 'k', 'MarkerSize', 6);    
-plot(x1, y1, 'ko', 'MarkerFaceColor', 'k', 'MarkerSize', 6);          
-plot(xK(end), yK(end), 'ko', 'MarkerFaceColor', 'k', 'MarkerSize', 6);
-
 xlabel('x', 'FontSize', 12);
 ylabel('y', 'FontSize', 12);
 title('Թեք ուղիղ -> K-աձև կոր -> Աղեղ', 'FontSize', 13);
