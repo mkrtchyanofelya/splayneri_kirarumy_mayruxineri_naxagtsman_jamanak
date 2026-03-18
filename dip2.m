@@ -108,4 +108,12 @@ disp('tan(beta) =');
 disp(tg_beta)
 
 disp('beta (degrees) =');
-disp(beta_deg)
+    disp(beta_deg)
+
+fprintf('\nՍփլայնի հատվածների բանաձևերը՝\n\n');
+
+for i = 1:n-1
+    fprintf('[%g, %g] միջակայքում:\n', x(i), x(i+1));
+    fprintf('S%d(x) = %g %+g(x-%g) %+g(x-%g)^2 %+g(x-%g)^3\n\n', ...
+        i, a(i), b(i), x(i), c(i), x(i), d(i), x(i));
+end
